@@ -1,0 +1,166 @@
+-- Завдання 1. Створення бази даних, таблиць, полів, ключів:
+
+CREATE SCHEMA LibraryManagement;
+use LibraryManagement;
+CREATE TABLE Authors (
+	author_id INT AUTO_INCREMENT PRIMARY KEY,
+    author_name VARCHAR(40)
+);
+CREATE TABLE Genres (
+	genre_id INT AUTO_INCREMENT PRIMARY KEY,
+    genre_name VARCHAR(30)
+);
+CREATE TABLE Books (
+	book_id INT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(30),
+    publication_year YEAR,
+    author_id INT,
+    FOREIGN KEY (author_id) REFERENCES Authors(author_id),
+    genre_id INT,
+    FOREIGN KEY (genre_id) REFERENCES Genres(genre_id)
+);
+CREATE TABLE Users (
+	user_id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(40),
+    email VARCHAR(50)
+);
+CREATE TABLE Borrowed_books (
+	borrow_id INT AUTO_INCREMENT PRIMARY KEY,
+    borrow_date DATE,
+    return_date DATE,
+    book_id INT,
+    FOREIGN KEY (book_id) REFERENCES Books(book_id),
+    user_id INT,
+    FOREIGN KEY (user_id) REFERENCES Users(user_id)
+);
+
+-- Завдання 2. Внесення даних у таблиці та перевірка наявності у таблицях:
+use librarymanagement;
+INSERT INTO authors (author_name) VALUES ('Daniel Defoe'), ('Alexandre Dumas'), ('Albert Camus');
+ 
+INSERT INTO genres (genre_name) VALUES ('Adventure'),('Picaresque'),('Historical'),('Philosophical');
+
+INSERT INTO books (title, publication_year, author_id, genre_id) VALUES 
+('Robinson Crusoe', 1919, 1, 1), ('Moll Flanders', 1922, 1, 2),
+('The Three Musketeers', 1964, 2, 3), ('The Count of Monte Cristo', 1966, 2, 3),
+('The Stranger', 1942, 3, 4), ('The Plague', 1947, 3, 4);
+
+INSERT INTO users (username, email) VALUES ('Donald Trump','trump@gmail.com'), ('Elon Musk','musk@gmail.com'),
+('John Johnson','johnson@gmail.com');
+
+INSERT INTO borrowed_books (book_id, user_id, borrow_date, return_date) VALUES (1,1,'2026-02-01','2026-02-15'),
+	(2,2,'2025-12-01','2025-12-25'), (3,3,'2025-06-11','2025-07-12'), (5,3,'2025-03-01','2025-03-15');
+
+select * from authors;
+select * from genres;
+select * from borrowed_books;
+-- select * from books;
+-- select * from users;
+
+-- Завдання 3:
+use hw03;
+select * from orders o 
+inner join order_details od on od.order_id=o.id
+inner join customers c on c.id=o.customer_id
+inner join products p on p.id=od.product_id
+inner join categories cat on cat.id=p.category_id
+inner join employees e on e.employee_id=o.employee_id
+inner join shippers sh on sh.id=o.shipper_id
+inner join suppliers sp on sp.id=p.supplier_id;
+
+-- Завдання 4.1 :
+use hw03;
+select count(*) from orders o 
+inner join order_details od on od.order_id=o.id
+inner join customers c on c.id=o.customer_id
+inner join products p on p.id=od.product_id
+inner join categories cat on cat.id=p.category_id
+inner join employees e on e.employee_id=o.employee_id
+inner join shippers sh on sh.id=o.shipper_id
+inner join suppliers sp on sp.id=p.supplier_id;
+
+-- Завдання 4.2 :
+use hw03;
+select count(*) from orders o 
+right join order_details od on od.order_id=o.id
+left join customers c on c.id=o.customer_id
+left join products p on p.id=od.product_id
+right join categories cat on cat.id=p.category_id
+inner join employees e on e.employee_id=o.employee_id
+inner join shippers sh on sh.id=o.shipper_id
+inner join suppliers sp on sp.id=p.supplier_id;
+
+Пояснение по результатам запросов 4.1 и 4.2 :
+Разные типы соединений в запросе не влияет на результат выборки, 
+поскольку все связи полные и обеспечивают целостность данных.
+
+
+-- Завдання 4.3 :
+use hw03;
+select * from orders o 
+inner join order_details od on od.order_id=o.id
+inner join customers c on c.id=o.customer_id
+inner join products p on p.id=od.product_id
+inner join categories cat on cat.id=p.category_id
+inner join employees e on e.employee_id=o.employee_id
+inner join shippers sh on sh.id=o.shipper_id
+inner join suppliers sp on sp.id=p.supplier_id
+where o.employee_id between 3 and 10;
+
+-- Завдання 4.4 :
+use hw03;
+select cat.name, count(*) qnt_records, AVG(od.quantity) average from orders o 
+inner join order_details od on od.order_id=o.id
+inner join customers c on c.id=o.customer_id
+inner join products p on p.id=od.product_id
+inner join categories cat on cat.id=p.category_id
+inner join employees e on e.employee_id=o.employee_id
+inner join shippers sh on sh.id=o.shipper_id
+inner join suppliers sp on sp.id=p.supplier_id
+where o.employee_id between 3 and 10
+group by cat.name;
+
+-- Завдання 4.5 :
+use hw03;
+select cat.name, count(*) qnt_records, AVG(od.quantity) average from orders o 
+inner join order_details od on od.order_id=o.id
+inner join customers c on c.id=o.customer_id
+inner join products p on p.id=od.product_id
+inner join categories cat on cat.id=p.category_id
+inner join employees e on e.employee_id=o.employee_id
+inner join shippers sh on sh.id=o.shipper_id
+inner join suppliers sp on sp.id=p.supplier_id
+where o.employee_id between 3 and 10
+group by cat.name
+having average > 21;
+
+-- Завдання 4.6 :
+use hw03;
+select cat.name, count(*) qnt_records, AVG(od.quantity) average from orders o 
+inner join order_details od on od.order_id=o.id
+inner join customers c on c.id=o.customer_id
+inner join products p on p.id=od.product_id
+inner join categories cat on cat.id=p.category_id
+inner join employees e on e.employee_id=o.employee_id
+inner join shippers sh on sh.id=o.shipper_id
+inner join suppliers sp on sp.id=p.supplier_id
+where o.employee_id between 3 and 10
+group by cat.name
+having average > 21
+order by qnt_records desc;
+
+-- Завдання 4.7 :
+use hw03;
+select cat.name, count(*) qnt_records, AVG(od.quantity) average from orders o 
+inner join order_details od on od.order_id=o.id
+inner join customers c on c.id=o.customer_id
+inner join products p on p.id=od.product_id
+inner join categories cat on cat.id=p.category_id
+inner join employees e on e.employee_id=o.employee_id
+inner join shippers sh on sh.id=o.shipper_id
+inner join suppliers sp on sp.id=p.supplier_id
+where o.employee_id between 3 and 10
+group by cat.name
+having average > 21
+order by qnt_records desc
+limit 4 offset 1;
